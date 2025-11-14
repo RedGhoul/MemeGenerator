@@ -7,6 +7,7 @@ import Header from './Components/Header'
 
 const HomeScreen = () => {
   const { data } = useListMeme()
+  const memeList = (data as any[]) || []
 
   const renderItem = ({ item }: any) => {
     return <CardImage data={item} />
@@ -24,7 +25,7 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <Header />
       <FlatList
-        data={data}
+        data={memeList}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         numColumns={2}
