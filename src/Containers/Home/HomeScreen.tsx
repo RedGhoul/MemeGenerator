@@ -1,24 +1,40 @@
-import { Colors } from '@/Constants'
+import { Colors, Spacing } from '@/Constants'
 import { useListMeme } from '@/Hooks/useListMeme'
-import React from 'react'
-import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native'
+import React, { useState } from 'react'
+import {
+  ActivityIndicator,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  View,
+} from 'react-native'
 import CardImage from './Components/CardImage'
 import Header from './Components/Header'
 
 const HomeScreen = () => {
-  const { data } = useListMeme()
+  const { data, isFetching, refetch } = useListMeme()
   const memeList = (data as any[]) || []
+  const [refreshing, setRefreshing] = useState(false)
+
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    await refetch()
+    setRefreshing(false)
+  }
 
   const renderItem = ({ item }: any) => {
     return <CardImage data={item} />
   }
 
   const renderLoading = () => {
-    return (
-      <View style={styles.loading}>
-        <ActivityIndicator size={'small'} color={'blue'} />
-      </View>
-    )
+    if (isFetching && !refreshing) {
+      return (
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      )
+    }
+    return null
   }
 
   return (
@@ -29,12 +45,19 @@ const HomeScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         numColumns={2}
-        contentContainerStyle={{
-          paddingHorizontal: 10,
-          flexGrow: 1,
-        }}
+        contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={renderLoading}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={Colors.primary}
+            colors={[Colors.primary]}
+            title="Pull to refresh"
+            titleColor={Colors.textSecondary}
+          />
+        }
       />
     </View>
   )
@@ -45,11 +68,17 @@ export default HomeScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
+  },
+  listContent: {
+    paddingHorizontal: Spacing.sm,
+    paddingBottom: Spacing.lg,
+    flexGrow: 1,
   },
   loading: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: Spacing.xxl,
   },
 })
