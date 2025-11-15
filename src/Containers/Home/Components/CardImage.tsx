@@ -1,10 +1,10 @@
-import { StackActions, useNavigation, useRoute } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
-import { Image, Pressable, StyleSheet, TouchableOpacity } from 'react-native'
+import { Image, StyleSheet, View } from 'react-native'
 import FastImage from 'react-native-fast-image'
 import { Images } from '@/Assets'
-import { Texts } from '@/Constants'
-import { useAppDispatch } from '@/Hooks'
+import { Texts, Colors, Radius, Spacing, Shadows } from '@/Constants'
+import { Card } from '@/Components'
 import { SCREEN_WIDTH } from '@/Utils/common'
 
 type Props = {
@@ -24,42 +24,59 @@ const CardImage = ({ data }: Props) => {
   }
 
   return (
-    <TouchableOpacity onPress={handleShowImageDetail} style={styles.viewImage}>
-      {loading && <Image source={Images.Loading} style={{ ...styles.imgTmp }} />}
-      <FastImage
-        source={{ uri: data?.blank }}
-        style={{ ...styles.imageItem }}
-        onLoadEnd={() => {
-          setLoading(false)
-        }}
-      />
-    </TouchableOpacity>
+    <Card
+      variant="default"
+      onPress={handleShowImageDetail}
+      style={styles.card}
+      contentStyle={styles.cardContent}
+      accessibilityLabel={`Meme template ${data?.name || 'image'}`}
+      accessibilityHint="Double tap to open meme editor"
+    >
+      <View style={styles.imageContainer}>
+        {loading && (
+          <Image source={Images.Loading} style={styles.loadingImage} />
+        )}
+        <FastImage
+          source={{ uri: data?.blank }}
+          style={styles.memeImage}
+          onLoadEnd={() => setLoading(false)}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+      </View>
+    </Card>
   )
 }
 
 export default React.memo(CardImage)
 
 const styles = StyleSheet.create({
-  viewImage: {
+  card: {
     width: (SCREEN_WIDTH - 40) / 2,
-    height: (SCREEN_WIDTH - 40) / 2,
-    borderRadius: 10,
-    marginBottom: 10,
-    marginHorizontal: 5,
-    backgroundColor: 'rgba(0, 0, 0,0.1)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
+    marginHorizontal: Spacing.xs,
+    marginBottom: Spacing.sm,
+    borderRadius: Radius.lg,
+    ...Shadows.shadow2,
   },
-  imgTmp: {
-    borderRadius: 10,
-    position: 'absolute',
-    width: SCREEN_WIDTH / 8,
-    resizeMode: 'contain',
-    aspectRatio: 1,
+  cardContent: {
+    padding: 0, // No padding for image cards
   },
-  imageItem: {
+  imageContainer: {
     width: '100%',
     aspectRatio: 1,
+    backgroundColor: Colors.gray100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: Radius.lg,
+    overflow: 'hidden',
+  },
+  loadingImage: {
+    position: 'absolute',
+    width: SCREEN_WIDTH / 8,
+    height: SCREEN_WIDTH / 8,
+    resizeMode: 'contain',
+  },
+  memeImage: {
+    width: '100%',
+    height: '100%',
   },
 })

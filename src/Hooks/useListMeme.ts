@@ -1,8 +1,8 @@
 import handleError from '@/Helpers/handleError'
 import { axiosInstance } from '@/Service/api'
 import { END_POINT } from '@/Service/constant'
-import { useState } from 'react'
-import { useQuery } from 'react-query'
+import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 
 const request = async () => {
   const { data } = await axiosInstance.request({
@@ -15,16 +15,19 @@ const request = async () => {
 const useListMeme = () => {
   const [error, setError] = useState<string | null>(null)
 
-  const { isError, data, isFetching, refetch } = useQuery({
+  const { isError, data, isFetching, refetch, error: queryError } = useQuery({
     queryKey: ['get-useListMeme'],
     queryFn: () => request(),
-    onSuccess: (result) => {},
-    onError: (err) => {
-      const { message } = handleError(err)
-      setError(message || 'Something went wrong')
-    },
     enabled: true,
   })
+
+  useEffect(() => {
+    if (queryError) {
+      const { message } = handleError(queryError)
+      setError(message || 'Something went wrong')
+    }
+  }, [queryError])
+
   return { isError, isFetching, data, error, refetch, setError }
 }
 

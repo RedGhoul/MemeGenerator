@@ -1,17 +1,14 @@
 import {
-  Image,
   Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native'
 import React, { useState } from 'react'
-import { Colors, Fonts } from '@/Constants'
+import { Colors, Spacing, Typography } from '@/Constants'
+import { Button, Input } from '@/Components'
 import HeaderNormal from '../Home/Components/HeaderNormal'
 import { useRoute } from '@react-navigation/native'
 import { SCREEN_WIDTH, getExtensionFile, isAndroid, isIOS } from '@/Utils/common'
@@ -32,15 +29,15 @@ const MemeDetailScreen = (props: Props) => {
   const [bottomText, setBottomText] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const createSuccess = (data: any) => {
+  const createSuccess = (responseData: any) => {
     setLoading(false)
     Toast.show({
       type: 'success',
       text1: 'Success',
-      text2: 'Create Image Success',
+      text2: 'Meme created successfully!',
     })
-    if (data?.url) {
-      setImage(data.url)
+    if (responseData?.url) {
+      setImage(responseData.url)
     }
   }
 
@@ -52,11 +49,20 @@ const MemeDetailScreen = (props: Props) => {
     createSuccess
   )
 
-  const onPress = () => {
+  const handleCreateMeme = () => {
+    if (!topText.trim() && !bottomText.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter at least one text field',
+      })
+      return
+    }
     setLoading(true)
     refetch()
   }
-  const onPressDownload = () => {
+
+  const handleDownload = () => {
     setLoading(true)
     const { config, fs } = RNFetchBlob
     let PictureDir = isAndroid() ? fs.dirs.PictureDir : fs.dirs.DocumentDir
@@ -95,13 +101,21 @@ const MemeDetailScreen = (props: Props) => {
         }
         handleDownloadImageSuccess()
       })
+      .catch((error: any) => {
+        setLoading(false)
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to download image',
+        })
+      })
   }
 
   const handleDownloadImageSuccess = () => {
     Toast.show({
       type: 'success',
       text1: 'Success',
-      text2: `Download Image Success.`,
+      text2: 'Image downloaded successfully!',
     })
   }
 
@@ -111,37 +125,56 @@ const MemeDetailScreen = (props: Props) => {
       <StatusBar translucent={false} backgroundColor={Colors.white} />
       <View style={styles.container}>
         <HeaderNormal title={data?.name} />
-        <ScrollView contentContainerStyle={styles.body}>
-          <View style={styles.viewInput}>
-            <Text style={styles.txt}>Top Text: </Text>
-            <TextInput
-              value={topText}
-              onChangeText={setTopText}
-              style={styles.input}
-              placeholder='meme top text'
-              placeholderTextColor={Colors.colorA3A9AC}
+        <ScrollView
+          contentContainerStyle={styles.body}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Text Inputs */}
+          <Input
+            label="Top Text"
+            placeholder="Enter top text..."
+            value={topText}
+            onChangeText={setTopText}
+            maxLength={100}
+            showCharacterCount
+            helperText="Text that appears at the top of the meme"
+          />
+
+          <Input
+            label="Bottom Text"
+            placeholder="Enter bottom text..."
+            value={bottomText}
+            onChangeText={setBottomText}
+            maxLength={100}
+            showCharacterCount
+            helperText="Text that appears at the bottom of the meme"
+          />
+
+          {/* Action Buttons */}
+          <View style={styles.buttonContainer}>
+            <Button
+              title="Create Meme"
+              variant="primary"
+              size="large"
+              onPress={handleCreateMeme}
+              loading={loading}
+              style={styles.button}
+              accessibilityLabel="Create meme with entered text"
+            />
+            <Button
+              title="Download"
+              variant="secondary"
+              size="large"
+              onPress={handleDownload}
+              disabled={loading}
+              style={styles.button}
+              accessibilityLabel="Download meme to device"
             />
           </View>
-          <View style={styles.viewInput}>
-            <Text style={styles.txt}>Buttom Text: </Text>
-            <TextInput
-              value={bottomText}
-              onChangeText={setBottomText}
-              style={styles.input}
-              placeholder='meme bottom text'
-              placeholderTextColor={Colors.colorA3A9AC}
-            />
-          </View>
-          <View style={styles.viewBtn}>
-            <TouchableOpacity style={styles.btn} onPress={onPress}>
-              <Text style={styles.txtBtn}>Create meme</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btn} onPress={onPressDownload}>
-              <Text style={styles.txtBtn}>Download</Text>
-            </TouchableOpacity>
-          </View>
+
+          {/* Meme Preview */}
           <AutoHeightImage
-            style={styles.img}
+            style={styles.memeImage}
             width={SCREEN_WIDTH - 40}
             source={{ uri: image }}
             loadingIndicatorSource={Images.Loading}
@@ -157,53 +190,28 @@ export default MemeDetailScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.white,
-    paddingBottom: 10,
+    backgroundColor: Colors.background,
   },
-
   body: {
     flexGrow: 1,
-    padding: 20,
-    paddingTop: 10,
+    padding: Spacing.lg,
+    paddingTop: Spacing.md,
   },
-  viewInput: {
-    marginTop: 10,
-  },
-  txt: {
-    color: '#000',
-    fontSize: 16,
-    fontFamily: Fonts.BeVietnamProSemiBold,
-  },
-  input: {
-    marginTop: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.colorD9D9D9,
-    paddingHorizontal: 10,
-    color: Colors.black,
-    paddingVertical: 8,
-  },
-  viewBtn: {
+  buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
+    justifyContent: 'space-between',
+    marginTop: Spacing.md,
+    marginBottom: Spacing.lg,
+    gap: Spacing.md,
   },
-  btn: {
-    backgroundColor: Colors.yellow,
-    padding: 10,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginHorizontal: 10,
+  button: {
+    flex: 1,
   },
-  txtBtn: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    color: '#000',
-  },
-  img: {
-    marginTop: 20,
+  memeImage: {
+    marginTop: Spacing.lg,
     alignSelf: 'center',
     width: SCREEN_WIDTH - 40,
-    backgroundColor: '#99999922',
+    backgroundColor: Colors.gray100,
+    borderRadius: 12,
   },
 })
