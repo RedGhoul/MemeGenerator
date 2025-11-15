@@ -1,9 +1,9 @@
-import { StyleSheet, TextStyle, TouchableOpacity, View, ViewStyle } from 'react-native'
+import { StyleSheet, TextStyle, View, ViewStyle, Text } from 'react-native'
 import React from 'react'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { goBack } from '@/Navigators/utils'
-import { Text } from 'react-native'
-import { Fonts } from '@/Constants'
+import { Colors, Spacing, Typography } from '@/Constants'
+import { IconButton } from '@/Components'
 
 type Props = {
   title: string
@@ -15,26 +15,26 @@ type Props = {
 const HeaderNormal = ({ title, containerStyle, titleStyle, showBorderBottom = true }: Props) => {
   return (
     <View
-      style={{
-        ...styles.view,
-        ...containerStyle,
-        borderBottomWidth: showBorderBottom ? 0.5 : 0,
-        borderBottomColor: '#99999933',
-      }}
+      style={[
+        styles.container,
+        showBorderBottom && styles.containerWithBorder,
+        containerStyle,
+      ]}
     >
-      <TouchableOpacity
-        onPress={() => {
-          goBack()
-        }}
-      >
-        <Icon name='arrow-back-outline' size={22} color={'#000'} />
-      </TouchableOpacity>
-      <Text style={{ ...styles.text, ...titleStyle }} numberOfLines={1}>
+      <IconButton
+        icon={<Icon name="arrow-back-outline" size={24} color={Colors.textPrimary} />}
+        onPress={goBack}
+        variant="ghost"
+        accessibilityLabel="Go back"
+        accessibilityHint="Navigate to previous screen"
+      />
+
+      <Text style={[styles.title, titleStyle]} numberOfLines={1}>
         {title}
       </Text>
-      <TouchableOpacity disabled={true}>
-        <Icon name='arrow-back-outline' size={22} color={'transparent'} />
-      </TouchableOpacity>
+
+      {/* Spacer for centering */}
+      <View style={styles.spacer} />
     </View>
   )
 }
@@ -42,17 +42,25 @@ const HeaderNormal = ({ title, containerStyle, titleStyle, showBorderBottom = tr
 export default HeaderNormal
 
 const styles = StyleSheet.create({
-  view: {
+  container: {
     flexDirection: 'row',
-    paddingHorizontal: 12,
-    height: 50,
+    paddingHorizontal: Spacing.md,
+    height: 56,
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: Colors.background,
   },
-  text: {
-    color: '#000',
-    fontSize: 20,
-    paddingHorizontal: 20,
-    fontFamily: Fonts.BeVietnamProMedium,
+  containerWithBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.gray200,
+  },
+  title: {
+    ...Typography.h5,
+    flex: 1,
+    textAlign: 'center',
+    paddingHorizontal: Spacing.md,
+  },
+  spacer: {
+    width: 48, // Same width as IconButton to balance the layout
   },
 })

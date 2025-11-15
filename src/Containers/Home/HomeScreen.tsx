@@ -2,7 +2,6 @@ import { Colors, Spacing } from '@/Constants'
 import { useListMeme } from '@/Hooks/useListMeme'
 import React, { useState } from 'react'
 import {
-  ActivityIndicator,
   FlatList,
   RefreshControl,
   StyleSheet,
@@ -10,6 +9,7 @@ import {
 } from 'react-native'
 import CardImage from './Components/CardImage'
 import Header from './Components/Header'
+import { SkeletonMemeCard } from '@/Components'
 
 const HomeScreen = () => {
   const { data, isFetching, refetch } = useListMeme()
@@ -27,10 +27,13 @@ const HomeScreen = () => {
   }
 
   const renderLoading = () => {
-    if (isFetching && !refreshing) {
+    if (isFetching && !refreshing && memeList.length === 0) {
+      // Show skeleton cards while loading
       return (
-        <View style={styles.loading}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+        <View style={styles.skeletonContainer}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonMemeCard key={`skeleton-${index}`} />
+          ))}
         </View>
       )
     }
@@ -75,10 +78,10 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.lg,
     flexGrow: 1,
   },
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: Spacing.xxl,
+  skeletonContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: Spacing.sm,
+    paddingTop: Spacing.md,
   },
 })
