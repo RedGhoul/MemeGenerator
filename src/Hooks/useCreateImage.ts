@@ -6,6 +6,7 @@ import { useMutation } from '@tanstack/react-query'
 export interface CreateImagePayload {
   template_id: string
   text: string[]
+  font?: string
 }
 
 export interface CreateImageResponse {

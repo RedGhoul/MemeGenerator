@@ -14,9 +14,11 @@ import { useRoute } from '@react-navigation/native'
 import { SCREEN_WIDTH, getExtensionFile, isAndroid, isIOS } from '@/Utils/common'
 import AutoHeightImage from 'react-native-auto-height-image'
 import { useCreateImage, CreateImageResponse } from '@/Hooks/useCreateImage'
+import { useListFonts } from '@/Hooks/useListFonts'
 import Toast from 'react-native-toast-message'
 import { Images } from '@/Assets'
 import { MemeTemplate } from '@/Type'
+import FontPicker from './Components/FontPicker'
 import RNFetchBlob from 'rn-fetch-blob'
 import Spinner from 'react-native-loading-spinner-overlay'
 
@@ -49,7 +51,10 @@ const MemeDetailScreen = () => {
   const lineCount = getLineCount(data)
   const [image, setImage] = useState(data?.blank)
   const [texts, setTexts] = useState<string[]>(() => Array(lineCount).fill(''))
+  const [selectedFont, setSelectedFont] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  const { data: fonts, isFetching: fontsLoading } = useListFonts()
 
   const handleTextChange = (index: number, value: string) => {
     setTexts((prev) => {
@@ -102,6 +107,7 @@ const MemeDetailScreen = () => {
     mutate({
       template_id: data.id,
       text: trimmed,
+      ...(selectedFont ? { font: selectedFont } : {}),
     })
   }
 
@@ -187,6 +193,14 @@ const MemeDetailScreen = () => {
               />
             )
           })}
+
+          {/* Font Selector */}
+          <FontPicker
+            fonts={fonts ?? []}
+            selectedFont={selectedFont}
+            onSelect={setSelectedFont}
+            loading={fontsLoading}
+          />
 
           {/* Action Buttons */}
           <View style={styles.buttonContainer}>

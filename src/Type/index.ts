@@ -14,6 +14,13 @@ export interface MemeTemplate {
   _self: string
 }
 
+export interface Font {
+  id: string
+  alias: string | null
+  filename: string
+  _self: string
+}
+
 export interface User {
   address: string | null
   avatar: string | null
