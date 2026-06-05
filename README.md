@@ -23,7 +23,7 @@ generate shareable memes in seconds — powered by the open‑source
 - ✍️ **Create memes** — add top/bottom captions and generate a finished image.
 - ⚡ **Fast image loading** — cached, optimized rendering with skeleton loaders.
 - 💾 **Save & share** — download generated memes to your device.
-- 🌐 **Offline‑friendly state** — user/session state persisted with Redux Persist.
+- 🚀 **No sign-up** — download and start making memes immediately, no account or login.
 
 ---
 
@@ -34,7 +34,6 @@ generate shareable memes in seconds — powered by the open‑source
 | Framework | React Native `0.85.3`, React `19.2` |
 | Language | TypeScript `5.7` (strict mode) |
 | Navigation | React Navigation v7 (native stack + bottom tabs) |
-| Global state | Redux Toolkit + React Redux + Redux Persist |
 | Server state | TanStack React Query |
 | Networking | Axios → `https://api.memegen.link` |
 | Animations | Reanimated 4 + `react-native-worklets` |
@@ -49,24 +48,21 @@ generate shareable memes in seconds — powered by the open‑source
 
 ```text
 MemeGenerator/
-├── App.tsx                 # Root component (providers: Redux, React Query, Navigation)
+├── App.tsx                 # Root component (providers: React Query, Navigation)
 ├── index.js                # App entry point
 ├── src/
 │   ├── Assets/             # Fonts, SVG icons, images (+ barrel index.ts)
 │   ├── Components/         # Reusable UI: Button, Card, Input, Skeleton, EmptyState…
 │   ├── Constants/          # Design tokens: Colors, Fonts, Spacing, Radius, Shadows, Typography, Texts
 │   ├── Containers/         # Screen-level features (UI + logic)
-│   │   ├── Auth/Login/     # LoginScreen
 │   │   ├── Home/           # HomeScreen + Components (CardImage, Header…)
 │   │   ├── MemeDetail/     # MemeDetailScreen (the meme editor)
 │   │   ├── Profile/        # ProfileScreen
 │   │   └── SplashScreen.tsx
 │   ├── Helpers/            # Pure utilities (e.g. handleError)
-│   ├── Hooks/              # React Query hooks: useListMeme, useCreateImage, useStore
-│   ├── Model/              # Data models / interfaces (UserModel…)
+│   ├── Hooks/              # React Query hooks: useListMeme, useCreateImage, useListFonts
 │   ├── Navigators/         # Navigation config: Application, MainBottomTab, Stack, utils
 │   ├── Service/            # Axios instance (api.ts) + endpoint constants (constant.ts)
-│   ├── Stores/             # Redux store + slices (User)
 │   ├── Type/               # Shared TypeScript types
 │   └── Utils/              # Common helpers
 ├── __tests__/              # Jest test suite
@@ -79,8 +75,7 @@ MemeGenerator/
 
 - **Containers** hold screen-level business logic; **Components** are presentational and reusable.
 - **Hooks** wrap the API with React Query (`useQuery` for reads, `useMutation` for writes).
-- **Service** centralizes the Axios instance, base URL, interceptors, and endpoints.
-- **Stores** owns global, persisted state (auth token, user info, language).
+- **Service** centralizes the Axios instance, base URL, and endpoints.
 - **Constants** is the single source of truth for design tokens — import these instead of hard-coding values.
 
 ---
@@ -102,18 +97,11 @@ SplashScreen ──▶ HomeScreen (meme list) ──▶ MemeDetailScreen (editor
 
 ### State management
 
-- **Global / persisted** — Redux Toolkit store (`src/Stores/index.ts`) with Redux
-  Persist over AsyncStorage. The `User` slice tracks `token`, `userInfo`, and
-  `language`. Access it through the typed hooks:
-
-  ```ts
-  import { useAppDispatch, useAppSelector } from '@/Hooks/useStore'
-
-  const dispatch = useAppDispatch()
-  const { token, userInfo } = useAppSelector(state => state.user)
-  ```
+The app has no global client-state store and no authentication — the Memegen API
+is public, so there's no login, token, or persisted user state.
 
 - **Server state** — React Query handles fetching, caching, and loading/error states.
+- **Local state** — React component hooks (`useState`, `useReducer`).
 
 ### API layer
 

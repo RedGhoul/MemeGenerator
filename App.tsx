@@ -1,10 +1,7 @@
 import ApplicationNavigator from '@/Navigators/Application'
-import { persistor, store } from '@/Stores'
 import React from 'react'
 import 'react-native-gesture-handler'
 import Toast from 'react-native-toast-message'
-import { Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/integration/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 export const queryClient = new QueryClient({
@@ -15,14 +12,10 @@ export const queryClient = new QueryClient({
 })
 
 const App = () => (
-  <Provider store={store}>
-    <PersistGate persistor={persistor} loading={null}>
-      <QueryClientProvider client={queryClient}>
-        <ApplicationNavigator />
-        <Toast />
-      </QueryClientProvider>
-    </PersistGate>
-  </Provider>
+  <QueryClientProvider client={queryClient}>
+    <ApplicationNavigator />
+    <Toast />
+  </QueryClientProvider>
 )
 
 export default App

@@ -8,8 +8,7 @@
 - **React Native** 0.85.3
 - **TypeScript** 5.7
 - **React** 19.2
-- **Redux Toolkit** + Redux Persist (state management)
-- **React Query** (`@tanstack/react-query`, data fetching)
+- **React Query** (`@tanstack/react-query`, server state / data fetching)
 - **React Navigation** v7 (navigation)
 - **Axios** (HTTP client)
 - **React Native Vector Icons** (icon system)
@@ -26,7 +25,6 @@ MemeGenerator/
 │   │   └── Images/              # PNG/JPG/GIF images
 │   ├── Components/              # Reusable UI components
 │   ├── Containers/              # Screen components (feature-based)
-│   │   ├── Auth/Login/
 │   │   ├── Home/
 │   │   ├── MemeDetail/
 │   │   └── Profile/
@@ -36,7 +34,6 @@ MemeGenerator/
 │   ├── Model/                   # Data models/interfaces
 │   ├── Navigators/              # Navigation configuration
 │   ├── Service/                 # API layer (Axios instance)
-│   ├── Stores/                  # Redux store & slices
 │   ├── Type/                    # TypeScript type definitions
 │   └── Utils/                   # Common utilities
 ├── android/                      # Android native code
@@ -71,44 +68,24 @@ SplashScreen (1s delay)
 - `navigateAndReset(routes, index)` - Reset navigation stack
 - `goBack()` - Navigate back
 
-### 2. State Management (Redux)
+### 2. State Management
 
-**File:** `src/Stores/index.ts`
+The app has **no global client-state store**. There is no login or auth flow
+(the public Memegen API requires no authentication), so there is no Redux,
+no redux-persist, and no AsyncStorage.
 
-**Store Configuration:**
-- Uses **Redux Toolkit** `configureStore`
-- **Redux Persist** with AsyncStorage for offline persistence
-- Serializable check disabled for non-serializable values
+- **Server state** is handled by **React Query** (`@tanstack/react-query`) —
+  caching, refetching, and loading/error states for API data.
+- **Local state** lives in React component hooks (`useState`, `useReducer`).
 
-**User Slice:** `src/Stores/User/User.ts`
-```typescript
-State: {
-  token: string | null
-  userInfo: User | null
-  language: string
-}
-
-Actions:
-- setToken(token)
-- setUserInfo(user)
-- setLanguage(lang)
-- clearUser()
-```
-
-**Usage Pattern:**
-```typescript
-import { useAppDispatch, useAppSelector } from '@/Stores/hooks'
-
-const dispatch = useAppDispatch()
-const { token, userInfo } = useAppSelector(state => state.user)
-```
+If a genuine need for shared client state arises later, add a lightweight
+solution scoped to that need rather than reintroducing a global store.
 
 ### 3. API Integration
 
 **Base Configuration:** `src/Service/api.ts`
 - Base URL: `https://api.memegen.link`
-- Request interceptor: Adds auth token and language headers (currently commented out)
-- Response interceptor: Handles 401 errors by clearing user state
+- A plain Axios instance with no auth interceptors (the Memegen API is public)
 
 **API Endpoints:** `src/Service/constant.ts`
 ```typescript
@@ -236,7 +213,6 @@ import { HomeScreen } from '@/Containers/Home/HomeScreen'
 
 - **Strict mode enabled** - All code must be type-safe
 - Type definitions in `src/Type/`
-- Export RootState and AppDispatch types for Redux hooks
 - Use interfaces for data models
 
 ### 2. Component Organization
@@ -272,20 +248,17 @@ export const useListMeme = () => {
 ### 4. State Management Patterns
 
 **Local State:** Use React hooks (`useState`, `useReducer`)
-**Global State:** Use Redux for:
-- User authentication (token, userInfo)
-- App-wide settings (language)
-- Data that persists across sessions
 
 **Server State:** Use React Query for:
 - API data fetching
 - Caching and refetching
 - Loading/error states
 
+There is no global client-state store (see "State Management" above).
+
 ### 5. Error Handling
 
 **API Layer:**
-- 401 errors automatically clear user state and redirect
 - Error responses include status code and message
 - Use React Query's error handling for UI feedback
 
@@ -308,13 +281,6 @@ export const useListMeme = () => {
 2. Create custom hook in `src/Hooks/useXXX.ts`
 3. Use React Query's `useQuery` (GET) or `useMutation` (POST/PUT/DELETE)
 4. Handle loading/error states in UI
-
-### Adding Redux State
-
-1. Create slice in `src/Stores/FeatureName/FeatureName.ts`
-2. Add reducer to store in `src/Stores/index.ts`
-3. Export typed hooks if needed
-4. Configure persistence in Redux Persist if required
 
 ### Adding New Assets
 
@@ -411,11 +377,7 @@ npm test
 - `react-native-safe-area-context` - Safe area handling
 
 **State & Data:**
-- `@reduxjs/toolkit` - Redux state management
-- `react-redux` - React bindings for Redux
-- `redux-persist` - State persistence
-- `@react-native-async-storage/async-storage` - Local storage
-- `react-query` - Server state management
+- `@tanstack/react-query` - Server state management
 - `axios` - HTTP client
 
 **Utilities:**
@@ -502,10 +464,9 @@ cd android && ./gradlew clean && cd ..
 
 ## Security Considerations
 
-1. **API Token Management:**
-   - Store tokens in Redux with Redux Persist
-   - Clear tokens on 401 responses
-   - Use AsyncStorage for local persistence
+1. **No Authentication:**
+   - The app uses the public Memegen API and has no login or auth flow
+   - No tokens, credentials, or user state are stored on device
 
 2. **Input Validation:**
    - Validate user input before API calls
@@ -539,7 +500,7 @@ cd android && ./gradlew clean && cd ..
 - **Memegen API:** [github.com/jacebrowning/memegen](https://github.com/jacebrowning/memegen)
 - **React Native Docs:** [reactnative.dev](https://reactnative.dev)
 - **React Navigation Docs:** [reactnavigation.org](https://reactnavigation.org)
-- **Redux Toolkit Docs:** [redux-toolkit.js.org](https://redux-toolkit.js.org)
+- **React Query Docs:** [tanstack.com/query](https://tanstack.com/query/latest)
 
 ## AI Assistant Guidelines
 
