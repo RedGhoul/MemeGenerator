@@ -1,9 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import React from 'react'
 
-type Props = {}
-
-const LoginScreen = (props: Props) => {
+const LoginScreen = () => {
   return (
     <View>
       <Text>LoginScreen</Text>
@@ -12,5 +10,3 @@ const LoginScreen = (props: Props) => {
 }
 
 export default LoginScreen
-
-const styles = StyleSheet.create({})

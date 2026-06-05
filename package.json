@@ -33,9 +33,9 @@
     "react-native-safe-area-context": "^5.6.2",
     "react-native-screens": "^4.18.0",
     "react-native-svg": "^15.15.0",
-    "react-native-worklets": "^0.9.1",
     "react-native-toast-message": "^2.3.3",
     "react-native-vector-icons": "^10.3.0",
+    "react-native-worklets": "^0.9.1",
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
     "redux-axios-middleware": "^4.0.1",
@@ -53,6 +53,7 @@
     "@react-native/jest-preset": "^0.85.3",
     "@react-native/metro-config": "^0.85.3",
     "@react-native/typescript-config": "^0.85.3",
+    "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
     "@types/lodash": "^4.17.15",
     "@types/react": "^19.2.16",
@@ -68,6 +69,12 @@
     "typescript": "^5.7.2"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "setupFiles": [
+      "./jest.setup.js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|@react-navigation|react-native-.*|rn-fetch-blob|axios|@reduxjs/toolkit|redux|redux-persist|redux-thunk|redux-axios-middleware|reselect|immer|react-redux))"
+    ]
   }
 }

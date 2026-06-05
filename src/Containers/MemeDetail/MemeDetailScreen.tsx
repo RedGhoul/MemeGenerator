@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native'
 import React, { useState } from 'react'
-import { Colors, Spacing, Typography } from '@/Constants'
+import { Colors, Spacing } from '@/Constants'
 import { Button, Input } from '@/Components'
 import HeaderNormal from '../Home/Components/HeaderNormal'
 import { useRoute } from '@react-navigation/native'
@@ -19,9 +19,7 @@ import { Images } from '@/Assets'
 import RNFetchBlob from 'rn-fetch-blob'
 import Spinner from 'react-native-loading-spinner-overlay'
 
-type Props = {}
-
-const MemeDetailScreen = (props: Props) => {
+const MemeDetailScreen = () => {
   const route = useRoute<any>()
   const data = route.params?.data
   const [image, setImage] = useState(data?.blank)
@@ -101,7 +99,7 @@ const MemeDetailScreen = (props: Props) => {
         }
         handleDownloadImageSuccess()
       })
-      .catch((error: any) => {
+      .catch(() => {
         setLoading(false)
         Toast.show({
           type: 'error',

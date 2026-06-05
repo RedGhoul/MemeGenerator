@@ -4,19 +4,20 @@ const plugins = [
     'module-resolver',
     {
       root: ['./src'],
-      extensions: ['.js', '.json'],
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
       alias: {
         '@': './src'
       }
     }
   ],
-  'react-native-reanimated/plugin',
   [
     'babel-plugin-inline-import',
     {
       extensions: ['.svg']
     }
-  ]
+  ],
+  // react-native-worklets/plugin (used by Reanimated 4) must be listed last.
+  'react-native-worklets/plugin'
 ]
 
 module.exports = {

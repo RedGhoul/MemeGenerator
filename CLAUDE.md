@@ -5,14 +5,15 @@
 **MemeGenerator** (also known as "Mememe Meme Generator") is a React Native mobile application that allows users to browse, create, and share memes. The app is available on the iOS App Store and uses the [Memegen API](https://api.memegen.link) for meme templates and image generation.
 
 ### Tech Stack
-- **React Native** 0.71.5
-- **TypeScript** 4.8.4
-- **React** 18.2.0
+- **React Native** 0.85.3
+- **TypeScript** 5.7
+- **React** 19.2
 - **Redux Toolkit** + Redux Persist (state management)
-- **React Query** (data fetching)
-- **React Navigation** v6 (navigation)
+- **React Query** (`@tanstack/react-query`, data fetching)
+- **React Navigation** v7 (navigation)
 - **Axios** (HTTP client)
 - **React Native Vector Icons** (icon system)
+- **Reanimated 4** (+ `react-native-worklets`)
 
 ## Directory Structure
 
@@ -193,12 +194,20 @@ npm run android
 ### Code Quality
 
 ```bash
-# Lint code
+# Lint code (ESLint 9 flat config: eslint.config.js)
 npm run lint
+
+# Type-check
+npx tsc --noEmit
 
 # Run tests
 npm run test
 ```
+
+**ESLint:** Uses the ESLint 9 **flat config** in `eslint.config.js`, extending
+`@react-native/eslint-config/flat`. (The legacy `.eslintrc.js` has been removed.)
+Flow lint rules are disabled for `.js` files since this is a TypeScript-only
+project.
 
 ### Code Style (Prettier)
 
@@ -333,9 +342,19 @@ export const useListMeme = () => {
 
 ## Testing
 
-**Framework:** Jest with React Native preset
+**Framework:** Jest (React Native preset) + `@testing-library/react-native`
+for component tests.
 
 **Test Location:** `__tests__/` directory
+
+**Setup:** `jest.setup.js` mocks native-only modules (vector icons,
+`rn-fetch-blob`) so components can render under Node. `transformIgnorePatterns`
+in the `jest` block of `package.json` allow-lists the RN/ESM packages that ship
+untranspiled sources.
+
+**Approach:** Prefer focused unit tests of pure logic (e.g. `Utils/common`,
+`Helpers/handleError`) and isolated component tests (e.g. `Button`) over brittle
+full-`<App />` render tests, which require the entire native stack to be mocked.
 
 **Running Tests:**
 ```bash
@@ -347,17 +366,20 @@ npm test
 ### Metro Bundler
 
 **File:** `metro.config.js`
+- Built on `@react-native/metro-config` (`getDefaultConfig` + `mergeConfig`) so
+  RN's asset registry/transformer defaults are preserved
 - Custom transformer for SVG support via `react-native-svg-transformer`
 - SVG files treated as source files, not assets
 
 ### Babel
 
 **File:** `babel.config.js`
-- Preset: `metro-react-native-babel-preset`
+- Preset: `module:@react-native/babel-preset`
 - Plugins:
   - `module-resolver` - Path aliases (@/)
-  - `react-native-reanimated/plugin` - Animation support
   - `babel-plugin-inline-import` - Inline SVG imports
+  - `react-native-worklets/plugin` - Reanimated 4 / worklets support
+    (must be listed **last**)
 
 ### React Native Config
 
@@ -552,6 +574,6 @@ cd android && ./gradlew clean && cd ..
 
 ---
 
-**Last Updated:** 2025-11-14
-**React Native Version:** 0.71.5
-**TypeScript Version:** 4.8.4
+**Last Updated:** 2026-06-05
+**React Native Version:** 0.85.3
+**TypeScript Version:** 5.7

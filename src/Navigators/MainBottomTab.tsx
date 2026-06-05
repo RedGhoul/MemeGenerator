@@ -2,14 +2,11 @@ import { Colors, Texts } from '@/Constants'
 import { HomeScreen, ProfileScreen } from '@/Navigators/Stack'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import React from 'react'
-import { StyleSheet } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
-
-type Props = {}
 
 const Tab = createBottomTabNavigator()
 
-const MainBottomTab = (props: Props) => {
+const MainBottomTab = () => {
   return (
     <Tab.Navigator
       initialRouteName={Texts.HomeScreen}
@@ -21,7 +18,7 @@ const MainBottomTab = (props: Props) => {
           borderTopColor: Colors.colorA3A9AC,
         },
 
-        tabBarIcon: ({ focused, color, size }) => {
+        tabBarIcon: ({ focused }) => {
           let iconName = ''
           let focusedColor = focused ? Colors.blue : Colors.colorA3A9AC
           if (route.name === Texts.HomeScreen) {
@@ -48,5 +45,3 @@ const MainBottomTab = (props: Props) => {
 }
 
 export default MainBottomTab
-
-const styles = StyleSheet.create({})
