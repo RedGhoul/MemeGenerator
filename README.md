@@ -37,7 +37,7 @@ generate shareable memes in seconds — powered by the open‑source
 | Server state | TanStack React Query |
 | Networking | Axios → `https://api.memegen.link` |
 | Animations | Reanimated 4 + `react-native-worklets` |
-| Images | `react-native-fast-image`, `react-native-auto-height-image`, `rn-fetch-blob` |
+| Images | `@d11/react-native-fast-image`, in-repo `AutoHeightImage`, `rn-fetch-blob` |
 | Icons | `react-native-vector-icons`, `react-native-svg` (inline SVG) |
 | Feedback | `react-native-toast-message`, `react-native-loading-spinner-overlay` |
 | Tooling | ESLint 9 (flat config), Prettier, Jest + Testing Library |

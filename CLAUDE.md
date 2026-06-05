@@ -144,9 +144,11 @@ const styles = StyleSheet.create({
 - Component: `IconSvgView.tsx` - Reusable SVG wrapper
 
 **Images:**
-- Optimized loading with `react-native-fast-image`
+- Optimized loading with `@d11/react-native-fast-image` (the maintained,
+  React 19-compatible fork of `react-native-fast-image`)
 - Download functionality via `rn-fetch-blob`
-- Auto-height images with `react-native-auto-height-image`
+- Auto-height images via the in-repo `AutoHeightImage` component
+  (`src/Components/AutoHeightImage/`)
 
 **Usage:**
 ```typescript
@@ -363,8 +365,7 @@ npm test
 - `react-native-reanimated` - Advanced animations
 
 **Image Handling:**
-- `react-native-fast-image` - Optimized image loading
-- `react-native-auto-height-image` - Responsive images
+- `@d11/react-native-fast-image` - Optimized image loading (maintained fork)
 - `react-native-image-progress` - Loading indicators
 - `rn-fetch-blob` - Download functionality
 
