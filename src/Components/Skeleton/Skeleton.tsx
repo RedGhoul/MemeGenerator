@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { View, StyleSheet, Animated, ViewStyle } from 'react-native'
+import { StyleSheet, Animated, ViewStyle } from 'react-native'
 import { Colors, Radius } from '@/Constants'
 
 export interface SkeletonProps {

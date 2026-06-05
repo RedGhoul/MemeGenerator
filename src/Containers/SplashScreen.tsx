@@ -3,7 +3,7 @@ import IconSvgView from '@/Components/IconSvgView'
 import { Texts } from '@/Constants'
 import { navigateAndSimpleReset } from '@/Navigators/utils'
 import React, { useEffect } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 const SplashScreen = () => {
   const init = async () => {
@@ -16,8 +16,9 @@ const SplashScreen = () => {
   }
 
   useEffect(() => {
+    // Run once on mount to bootstrap navigation after the splash delay.
     init()
-  })
+  }, [])
 
   return (
     <View style={styles.container}>

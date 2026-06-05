@@ -1,27 +1,13 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import { Images } from '@/Assets'
 import { Fonts } from '@/Constants'
 import Toast from 'react-native-toast-message'
 import Icon from 'react-native-vector-icons/Ionicons'
 
-type Props = {}
-
-const ProfileScreen = (props: Props) => {
+const ProfileScreen = () => {
   return (
-    <View
-      style={{
-        alignItems: 'center',
-      }}
-    >
-      <Text
-        style={{
-          fontFamily: Fonts.BeVietnamProMedium,
-          fontSize: 20,
-        }}
-      >
-        ProfileScreen
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>ProfileScreen</Text>
       <TouchableOpacity
         style={styles.btn}
         onPress={() => {
@@ -45,6 +31,13 @@ const ProfileScreen = (props: Props) => {
 export default ProfileScreen
 
 const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+  },
+  title: {
+    fontFamily: Fonts.BeVietnamProMedium,
+    fontSize: 20,
+  },
   btn: {
     margin: 20,
     padding: 10,

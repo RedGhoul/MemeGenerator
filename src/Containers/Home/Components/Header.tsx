@@ -1,22 +1,19 @@
-import { Image, StyleSheet, View } from 'react-native'
+import { Image, StatusBar, StatusBarProps, StyleSheet, View } from 'react-native'
 import React from 'react'
 import { Colors, Spacing, Shadows } from '@/Constants'
 import { Images } from '@/Assets'
 import { SCREEN_WIDTH } from '@/Utils/common'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { StatusBar } from 'react-native'
 import { useIsFocused } from '@react-navigation/native'
 
-type Props = {}
+const FocusAwareStatusBar = (props: StatusBarProps) => {
+  const isFocused = useIsFocused()
+  return isFocused ? <StatusBar {...props} /> : null
+}
 
-const Header = (props: Props) => {
+const Header = () => {
   const insets = useSafeAreaInsets()
   const statusBarHeight = insets.top
-
-  const FocusAwareStatusBar = (props: any) => {
-    const isFocused = useIsFocused()
-    return isFocused ? <StatusBar {...props} /> : null
-  }
 
   return (
     <>
