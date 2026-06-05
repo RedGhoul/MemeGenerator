@@ -13,21 +13,53 @@ import HeaderNormal from '../Home/Components/HeaderNormal'
 import { useRoute } from '@react-navigation/native'
 import { SCREEN_WIDTH, getExtensionFile, isAndroid, isIOS } from '@/Utils/common'
 import AutoHeightImage from 'react-native-auto-height-image'
-import { useCreateImage } from '@/Hooks/useCreateImage'
+import { useCreateImage, CreateImageResponse } from '@/Hooks/useCreateImage'
 import Toast from 'react-native-toast-message'
 import { Images } from '@/Assets'
+import { MemeTemplate } from '@/Type'
 import RNFetchBlob from 'rn-fetch-blob'
 import Spinner from 'react-native-loading-spinner-overlay'
 
+// The API exposes templates with a variable number of text lines. Fall back to
+// 2 (classic top/bottom) when the count is missing, and cap it so the editor
+// stays usable for templates with many overlays.
+const MAX_TEXT_LINES = 6
+
+const getLineCount = (template?: MemeTemplate): number => {
+  const lines = template?.lines ?? 2
+  return Math.min(Math.max(lines, 1), MAX_TEXT_LINES)
+}
+
+const getLineLabel = (index: number, total: number): string => {
+  if (total === 1) {
+    return 'Text'
+  }
+  if (index === 0) {
+    return 'Top Text'
+  }
+  if (index === total - 1) {
+    return 'Bottom Text'
+  }
+  return `Line ${index + 1}`
+}
+
 const MemeDetailScreen = () => {
   const route = useRoute<any>()
-  const data = route.params?.data
+  const data = route.params?.data as MemeTemplate | undefined
+  const lineCount = getLineCount(data)
   const [image, setImage] = useState(data?.blank)
-  const [topText, setTopText] = useState('')
-  const [bottomText, setBottomText] = useState('')
+  const [texts, setTexts] = useState<string[]>(() => Array(lineCount).fill(''))
   const [loading, setLoading] = useState(false)
 
-  const createSuccess = (responseData: any) => {
+  const handleTextChange = (index: number, value: string) => {
+    setTexts((prev) => {
+      const next = [...prev]
+      next[index] = value
+      return next
+    })
+  }
+
+  const createSuccess = (responseData: CreateImageResponse) => {
     setLoading(false)
     Toast.show({
       type: 'success',
@@ -39,16 +71,23 @@ const MemeDetailScreen = () => {
     }
   }
 
-  const { refetch } = useCreateImage(
-    {
-      template_id: data.id,
-      text: [topText.trim(), bottomText.trim()],
-    },
-    createSuccess
-  )
+  const handleCreateError = (message: string) => {
+    setLoading(false)
+    Toast.show({
+      type: 'error',
+      text1: 'Error',
+      text2: message,
+    })
+  }
+
+  const { mutate } = useCreateImage({
+    createSuccess,
+    onError: handleCreateError,
+  })
 
   const handleCreateMeme = () => {
-    if (!topText.trim() && !bottomText.trim()) {
+    const trimmed = texts.map((text) => text.trim())
+    if (trimmed.every((text) => !text)) {
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -56,8 +95,14 @@ const MemeDetailScreen = () => {
       })
       return
     }
+    if (!data?.id) {
+      return
+    }
     setLoading(true)
-    refetch()
+    mutate({
+      template_id: data.id,
+      text: trimmed,
+    })
   }
 
   const handleDownload = () => {
@@ -127,26 +172,21 @@ const MemeDetailScreen = () => {
           contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}
         >
-          {/* Text Inputs */}
-          <Input
-            label="Top Text"
-            placeholder="Enter top text..."
-            value={topText}
-            onChangeText={setTopText}
-            maxLength={100}
-            showCharacterCount
-            helperText="Text that appears at the top of the meme"
-          />
-
-          <Input
-            label="Bottom Text"
-            placeholder="Enter bottom text..."
-            value={bottomText}
-            onChangeText={setBottomText}
-            maxLength={100}
-            showCharacterCount
-            helperText="Text that appears at the bottom of the meme"
-          />
+          {/* Text Inputs (one per line the template supports) */}
+          {texts.map((value, index) => {
+            const label = getLineLabel(index, texts.length)
+            return (
+              <Input
+                key={index}
+                label={label}
+                placeholder={`Enter ${label.toLowerCase()}...`}
+                value={value}
+                onChangeText={(text) => handleTextChange(index, text)}
+                maxLength={100}
+                showCharacterCount
+              />
+            )
+          })}
 
           {/* Action Buttons */}
           <View style={styles.buttonContainer}>

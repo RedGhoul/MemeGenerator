@@ -1,43 +1,44 @@
 import handleError from '@/Helpers/handleError'
 import { axiosInstance } from '@/Service/api'
 import { END_POINT } from '@/Service/constant'
-import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 
-const request = async (payload: any) => {
+export interface CreateImagePayload {
+  template_id: string
+  text: string[]
+}
+
+export interface CreateImageResponse {
+  url: string
+}
+
+const request = async (payload: CreateImagePayload): Promise<CreateImageResponse> => {
   const { data } = await axiosInstance.request({
     method: 'POST',
     url: END_POINT.images,
-    data: {
-      ...payload,
-    },
+    data: payload,
   })
-  return data || []
+  return data
 }
 
-const useCreateImage = (payload: any, createSuccess: any) => {
-  const [error, setError] = useState<string | null>(null)
+interface UseCreateImageOptions {
+  createSuccess?: (data: CreateImageResponse) => void
+  onError?: (message: string) => void
+}
 
-  const { isError, data, isFetching, refetch, error: queryError } = useQuery({
-    queryKey: ['post-useCreateImage'],
-    queryFn: () => request(payload),
-    enabled: false,
+const useCreateImage = ({ createSuccess, onError }: UseCreateImageOptions = {}) => {
+  const mutation = useMutation({
+    mutationFn: (payload: CreateImagePayload) => request(payload),
+    onSuccess: (data) => {
+      createSuccess?.(data)
+    },
+    onError: (error) => {
+      const { message } = handleError(error)
+      onError?.(message || 'Something went wrong')
+    },
   })
 
-  useEffect(() => {
-    if (data && !isFetching) {
-      createSuccess?.(data)
-    }
-  }, [data, isFetching, createSuccess])
-
-  useEffect(() => {
-    if (queryError) {
-      const { message } = handleError(queryError)
-      setError(message || 'Something went wrong')
-    }
-  }, [queryError])
-
-  return { isError, isFetching, data, error, refetch, setError }
+  return mutation
 }
 
 export { useCreateImage }
