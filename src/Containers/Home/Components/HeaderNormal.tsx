@@ -6,13 +6,20 @@ import { Colors, Spacing, Typography } from '@/Constants'
 import { IconButton } from '@/Components'
 
 type Props = {
-  title: string
+  title?: string
   containerStyle?: ViewStyle
   titleStyle?: TextStyle
   showBorderBottom?: boolean
+  rightAction?: React.ReactNode
 }
 
-const HeaderNormal = ({ title, containerStyle, titleStyle, showBorderBottom = true }: Props) => {
+const HeaderNormal = ({
+  title,
+  containerStyle,
+  titleStyle,
+  showBorderBottom = true,
+  rightAction,
+}: Props) => {
   return (
     <View
       style={[
@@ -33,8 +40,8 @@ const HeaderNormal = ({ title, containerStyle, titleStyle, showBorderBottom = tr
         {title}
       </Text>
 
-      {/* Spacer for centering */}
-      <View style={styles.spacer} />
+      {/* Right action, or a spacer to keep the title centered. */}
+      {rightAction ?? <View style={styles.spacer} />}
     </View>
   )
 }

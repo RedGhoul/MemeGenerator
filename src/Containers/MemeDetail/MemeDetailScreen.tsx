@@ -2,21 +2,25 @@ import {
   Platform,
   SafeAreaView,
   ScrollView,
+  Share,
   StatusBar,
   StyleSheet,
   View,
 } from 'react-native'
 import React, { useState } from 'react'
+import Icon from 'react-native-vector-icons/Ionicons'
 import { Colors, Spacing } from '@/Constants'
-import { AutoHeightImage, Button, Input } from '@/Components'
+import { AutoHeightImage, Button, IconButton, Input } from '@/Components'
 import HeaderNormal from '../Home/Components/HeaderNormal'
-import { useRoute } from '@react-navigation/native'
+import { RouteProp, useRoute } from '@react-navigation/native'
 import { SCREEN_WIDTH, getExtensionFile, isAndroid, isIOS } from '@/Utils/common'
 import { useCreateImage, CreateImageResponse } from '@/Hooks/useCreateImage'
 import { useListFonts } from '@/Hooks/useListFonts'
+import { useFavorites } from '@/Context/FavoritesContext'
 import Toast from 'react-native-toast-message'
 import { Images } from '@/Assets'
 import { MemeTemplate } from '@/Type'
+import { RootStackParamList } from '@/Type/navigation'
 import FontPicker from './Components/FontPicker'
 import RNFetchBlob from 'rn-fetch-blob'
 import Spinner from 'react-native-loading-spinner-overlay'
@@ -45,8 +49,8 @@ const getLineLabel = (index: number, total: number): string => {
 }
 
 const MemeDetailScreen = () => {
-  const route = useRoute<any>()
-  const data = route.params?.data as MemeTemplate | undefined
+  const route = useRoute<RouteProp<RootStackParamList, 'MemeDetailScreen'>>()
+  const data = route.params?.data
   const lineCount = getLineCount(data)
   const [image, setImage] = useState(data?.blank)
   const [texts, setTexts] = useState<string[]>(() => Array(lineCount).fill(''))
@@ -54,6 +58,8 @@ const MemeDetailScreen = () => {
   const [loading, setLoading] = useState(false)
 
   const { data: fonts, isFetching: fontsLoading } = useListFonts()
+  const { isFavorite, toggleFavorite } = useFavorites()
+  const favorited = data ? isFavorite(data.id) : false
 
   const handleTextChange = (index: number, value: string) => {
     setTexts((prev) => {
@@ -110,12 +116,30 @@ const MemeDetailScreen = () => {
     })
   }
 
+  const handleShare = async () => {
+    if (!image) {
+      return
+    }
+    try {
+      await Share.share({
+        message: `Check out this meme: ${image}`,
+        url: image,
+      })
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to share meme',
+      })
+    }
+  }
+
   const handleDownload = () => {
     setLoading(true)
     const { config, fs } = RNFetchBlob
     let PictureDir = isAndroid() ? fs.dirs.PictureDir : fs.dirs.DocumentDir
-    let ext: any = getExtensionFile(image)
-    ext = '.' + ext[0]
+    const extMatch = getExtensionFile(image)
+    const ext = extMatch ? '.' + extMatch[0] : ''
 
     let options =
       Platform.OS === 'ios'
@@ -172,7 +196,27 @@ const MemeDetailScreen = () => {
       <Spinner visible={loading} />
       <StatusBar translucent={false} backgroundColor={Colors.white} />
       <View style={styles.container}>
-        <HeaderNormal title={data?.name} />
+        <HeaderNormal
+          title={data?.name}
+          rightAction={
+            data ? (
+              <IconButton
+                icon={
+                  <Icon
+                    name={favorited ? 'heart' : 'heart-outline'}
+                    size={22}
+                    color={favorited ? Colors.error : Colors.textPrimary}
+                  />
+                }
+                onPress={() => toggleFavorite(data.id)}
+                variant="ghost"
+                accessibilityLabel={
+                  favorited ? 'Remove from favorites' : 'Add to favorites'
+                }
+              />
+            ) : undefined
+          }
+        />
         <ScrollView
           contentContainerStyle={styles.body}
           showsVerticalScrollIndicator={false}
@@ -202,16 +246,16 @@ const MemeDetailScreen = () => {
           />
 
           {/* Action Buttons */}
+          <Button
+            title="Create Meme"
+            variant="primary"
+            size="large"
+            onPress={handleCreateMeme}
+            loading={loading}
+            style={styles.createButton}
+            accessibilityLabel="Create meme with entered text"
+          />
           <View style={styles.buttonContainer}>
-            <Button
-              title="Create Meme"
-              variant="primary"
-              size="large"
-              onPress={handleCreateMeme}
-              loading={loading}
-              style={styles.button}
-              accessibilityLabel="Create meme with entered text"
-            />
             <Button
               title="Download"
               variant="secondary"
@@ -220,6 +264,15 @@ const MemeDetailScreen = () => {
               disabled={loading}
               style={styles.button}
               accessibilityLabel="Download meme to device"
+            />
+            <Button
+              title="Share"
+              variant="outline"
+              size="large"
+              onPress={handleShare}
+              disabled={loading}
+              style={styles.button}
+              accessibilityLabel="Share meme"
             />
           </View>
 
@@ -247,6 +300,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: Spacing.lg,
     paddingTop: Spacing.md,
+  },
+  createButton: {
+    marginTop: Spacing.md,
   },
   buttonContainer: {
     flexDirection: 'row',

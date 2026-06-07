@@ -37,6 +37,7 @@ const Input: React.FC<InputProps> = ({
   showCharacterCount = false,
   required,
   value = '',
+  accessibilityLabel,
   ...textInputProps
 }) => {
   const [isFocused, setIsFocused] = useState(false)
@@ -83,6 +84,7 @@ const Input: React.FC<InputProps> = ({
           onBlur={() => setIsFocused(false)}
           value={value}
           maxLength={maxLength}
+          accessibilityLabel={accessibilityLabel ?? label}
           {...textInputProps}
         />
 

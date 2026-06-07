@@ -3,6 +3,8 @@ import React from 'react'
 import 'react-native-gesture-handler'
 import Toast from 'react-native-toast-message'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ErrorBoundary } from '@/Components'
+import { FavoritesProvider } from '@/Context/FavoritesContext'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -12,10 +14,14 @@ export const queryClient = new QueryClient({
 })
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ApplicationNavigator />
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <FavoritesProvider>
+        <ApplicationNavigator />
+      </FavoritesProvider>
+    </QueryClientProvider>
     <Toast />
-  </QueryClientProvider>
+  </ErrorBoundary>
 )
 
 export default App

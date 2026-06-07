@@ -1,19 +1,24 @@
 import { StackActions, useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
-import { Image, StyleSheet, View } from 'react-native'
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import FastImage from '@d11/react-native-fast-image'
+import Icon from 'react-native-vector-icons/Ionicons'
 import { Images } from '@/Assets'
 import { Texts, Colors, Radius, Spacing, Shadows } from '@/Constants'
 import { Card } from '@/Components'
 import { SCREEN_WIDTH } from '@/Utils/common'
+import { MemeTemplate } from '@/Type'
+import { useFavorites } from '@/Context/FavoritesContext'
 
 type Props = {
-  data: any
+  data: MemeTemplate
 }
 
 const CardImage = ({ data }: Props) => {
   const navigation = useNavigation()
   const [loading, setLoading] = useState(true)
+  const { isFavorite, toggleFavorite } = useFavorites()
+  const favorited = isFavorite(data.id)
 
   const handleShowImageDetail = (): void => {
     navigation.dispatch(
@@ -42,6 +47,24 @@ const CardImage = ({ data }: Props) => {
           onLoadEnd={() => setLoading(false)}
           resizeMode={FastImage.resizeMode.cover}
         />
+        <TouchableOpacity
+          style={styles.favoriteButton}
+          onPress={() => toggleFavorite(data.id)}
+          accessibilityRole="button"
+          accessibilityLabel={
+            favorited
+              ? `Remove ${data?.name || 'meme'} from favorites`
+              : `Add ${data?.name || 'meme'} to favorites`
+          }
+          accessibilityState={{ selected: favorited }}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Icon
+            name={favorited ? 'heart' : 'heart-outline'}
+            size={18}
+            color={favorited ? Colors.error : Colors.white}
+          />
+        </TouchableOpacity>
       </View>
     </Card>
   )
@@ -78,5 +101,16 @@ const styles = StyleSheet.create({
   memeImage: {
     width: '100%',
     height: '100%',
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: Spacing.xs,
+    right: Spacing.xs,
+    width: 32,
+    height: 32,
+    borderRadius: Radius.round,
+    backgroundColor: Colors.overlay,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 })

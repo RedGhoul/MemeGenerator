@@ -26,9 +26,9 @@ MemeGenerator/
 │   ├── Components/              # Reusable UI components
 │   ├── Containers/              # Screen components (feature-based)
 │   │   ├── Home/
-│   │   ├── MemeDetail/
-│   │   └── Profile/
+│   │   └── MemeDetail/
 │   ├── Constants/               # App constants (Colors, Fonts, Strings)
+│   ├── Context/                 # Lightweight React Context stores (Favorites)
 │   ├── Helpers/                 # Utility helper functions
 │   ├── Hooks/                   # Custom React hooks (API integration)
 │   ├── Model/                   # Data models/interfaces
@@ -51,16 +51,15 @@ MemeGenerator/
 **File:** `src/Navigators/Application.tsx`
 
 The app uses React Navigation with:
-- **Native Stack Navigator** for main screens
-- **Bottom Tab Navigator** for Home/Profile tabs
+- **Native Stack Navigator** for all screens (typed via `RootStackParamList`
+  in `src/Type/navigation.ts`)
 - **Navigation utilities** in `src/Navigators/utils.ts`
 
 **Screen Flow:**
 ```
 SplashScreen (1s delay)
-  → HomeScreen (Main Tab: Meme List)
-  → MemeDetailScreen (Meme Editor)
-  → ProfileScreen (Main Tab: User Profile)
+  → HomeScreen (Meme List: search, category filters, favorites)
+  → MemeDetailScreen (Meme Editor: create, download, share, favorite)
 ```
 
 **Key Navigation Functions:**
@@ -70,16 +69,19 @@ SplashScreen (1s delay)
 
 ### 2. State Management
 
-The app has **no global client-state store**. There is no login or auth flow
-(the public Memegen API requires no authentication), so there is no Redux,
-no redux-persist, and no AsyncStorage.
+The app has **no global client-state store** (no Redux/redux-persist). There is
+no login or auth flow (the public Memegen API requires no authentication).
 
 - **Server state** is handled by **React Query** (`@tanstack/react-query`) —
   caching, refetching, and loading/error states for API data.
 - **Local state** lives in React component hooks (`useState`, `useReducer`).
+- **Favorites** are the one piece of shared, persisted client state. They live
+  in a small, single-purpose **React Context** (`src/Context/FavoritesContext.tsx`)
+  backed by `@react-native-async-storage/async-storage` — a lightweight store
+  scoped to that need, per the guidance below.
 
-If a genuine need for shared client state arises later, add a lightweight
-solution scoped to that need rather than reintroducing a global store.
+If a genuine need for further shared client state arises later, add a
+lightweight solution scoped to that need rather than reintroducing a global store.
 
 ### 3. API Integration
 
@@ -372,13 +374,13 @@ npm test
 **Navigation:**
 - `@react-navigation/native` - Core navigation
 - `@react-navigation/native-stack` - Stack navigator
-- `@react-navigation/bottom-tabs` - Tab navigator
 - `react-native-gesture-handler` - Gesture support
 - `react-native-screens` - Native screens
 - `react-native-safe-area-context` - Safe area handling
 
 **State & Data:**
 - `@tanstack/react-query` - Server state management
+- `@react-native-async-storage/async-storage` - Persisted favorites
 - `axios` - HTTP client
 
 **Utilities:**

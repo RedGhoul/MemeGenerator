@@ -5,11 +5,7 @@
  * You can add other navigation functions that you need and export them
  */
 import { CommonActions, createNavigationContainerRef } from '@react-navigation/native'
-
-type RootStackParamList = {
-  Splash: undefined
-  DetailScreen: any
-}
+import type { RootStackParamList } from '@/Type/navigation'
 
 export const navigationRef = createNavigationContainerRef<RootStackParamList>()
 

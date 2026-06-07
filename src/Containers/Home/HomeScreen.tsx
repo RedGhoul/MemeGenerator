@@ -1,20 +1,53 @@
 import { Colors, Spacing } from '@/Constants'
 import { useListMeme } from '@/Hooks/useListMeme'
-import React, { useState } from 'react'
+import { useFavorites } from '@/Context/FavoritesContext'
+import { MemeTemplate } from '@/Type'
 import {
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  View,
-} from 'react-native'
+  filterMemesByKeyword,
+  filterMemesByQuery,
+  getPopularKeywords,
+} from '@/Utils/memeFilter'
+import React, { useMemo, useState } from 'react'
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native'
 import CardImage from './Components/CardImage'
 import Header from './Components/Header'
-import { SkeletonMemeCard } from '@/Components'
+import SearchBar from './Components/SearchBar'
+import FilterChips, { FilterOption } from './Components/FilterChips'
+import { EmptyState, SkeletonMemeCard } from '@/Components'
+
+const FILTER_ALL = 'all'
+const FILTER_FAVORITES = 'favorites'
 
 const HomeScreen = () => {
-  const { data, isFetching, refetch } = useListMeme()
-  const memeList = (data as any[]) || []
+  const { data, isFetching, isError, refetch } = useListMeme()
+  const { favorites } = useFavorites()
+  const memeList = useMemo<MemeTemplate[]>(() => data ?? [], [data])
+
   const [refreshing, setRefreshing] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeFilter, setActiveFilter] = useState(FILTER_ALL)
+
+  const filterOptions = useMemo<FilterOption[]>(() => {
+    const keywords = getPopularKeywords(memeList).map((keyword) => ({
+      id: keyword,
+      label: keyword,
+    }))
+    return [
+      { id: FILTER_ALL, label: 'All' },
+      { id: FILTER_FAVORITES, label: 'Favorites' },
+      ...keywords,
+    ]
+  }, [memeList])
+
+  const filteredMemes = useMemo<MemeTemplate[]>(() => {
+    let base = memeList
+    if (activeFilter === FILTER_FAVORITES) {
+      base = base.filter((meme) => favorites.has(meme.id))
+    } else if (activeFilter !== FILTER_ALL) {
+      base = filterMemesByKeyword(base, activeFilter)
+    }
+    return filterMemesByQuery(base, searchQuery)
+  }, [memeList, activeFilter, favorites, searchQuery])
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -22,13 +55,10 @@ const HomeScreen = () => {
     setRefreshing(false)
   }
 
-  const renderItem = ({ item }: any) => {
-    return <CardImage data={item} />
-  }
+  const renderItem = ({ item }: { item: MemeTemplate }) => <CardImage data={item} />
 
-  const renderLoading = () => {
+  const renderEmpty = () => {
     if (isFetching && !refreshing && memeList.length === 0) {
-      // Show skeleton cards while loading
       return (
         <View style={styles.skeletonContainer}>
           {Array.from({ length: 6 }).map((_, index) => (
@@ -37,20 +67,52 @@ const HomeScreen = () => {
         </View>
       )
     }
-    return null
+
+    if (isError && memeList.length === 0) {
+      return (
+        <EmptyState
+          title="Couldn't load memes"
+          message="Check your connection and try again."
+          actionLabel="Retry"
+          onAction={handleRefresh}
+        />
+      )
+    }
+
+    if (activeFilter === FILTER_FAVORITES) {
+      return (
+        <EmptyState
+          title="No favorites yet"
+          message="Tap the heart on any meme to save it here."
+        />
+      )
+    }
+
+    return (
+      <EmptyState
+        title="No memes found"
+        message="Try a different search or filter."
+      />
+    )
   }
 
   return (
     <View style={styles.container}>
       <Header />
+      <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
+      <FilterChips
+        options={filterOptions}
+        activeId={activeFilter}
+        onSelect={setActiveFilter}
+      />
       <FlatList
-        data={memeList}
+        data={filteredMemes}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         numColumns={2}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={renderLoading}
+        ListEmptyComponent={renderEmpty}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
