@@ -6,8 +6,9 @@ import React from 'react'
 import { StatusBar } from 'react-native'
 import { navigationRef } from './utils'
 import MemeDetailScreen from '@/Containers/MemeDetail/MemeDetailScreen'
+import type { RootStackParamList } from '@/Type/navigation'
 
-const Stack = createNativeStackNavigator()
+const Stack = createNativeStackNavigator<RootStackParamList>()
 
 const ApplicationNavigator = () => {
   return (

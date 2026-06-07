@@ -14,6 +14,8 @@ export type { IconButtonProps } from './IconButton/IconButton'
 export { default as EmptyState } from './EmptyState/EmptyState'
 export type { EmptyStateProps } from './EmptyState/EmptyState'
 
+export { default as ErrorBoundary } from './ErrorBoundary/ErrorBoundary'
+
 export { default as Skeleton } from './Skeleton/Skeleton'
 export type { SkeletonProps } from './Skeleton/Skeleton'
 

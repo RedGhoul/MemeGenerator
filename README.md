@@ -52,16 +52,16 @@ MemeGenerator/
 ├── index.js                # App entry point
 ├── src/
 │   ├── Assets/             # Fonts, SVG icons, images (+ barrel index.ts)
-│   ├── Components/         # Reusable UI: Button, Card, Input, Skeleton, EmptyState…
+│   ├── Components/         # Reusable UI: Button, Card, Input, Skeleton, EmptyState, ErrorBoundary…
 │   ├── Constants/          # Design tokens: Colors, Fonts, Spacing, Radius, Shadows, Typography, Texts
 │   ├── Containers/         # Screen-level features (UI + logic)
-│   │   ├── Home/           # HomeScreen + Components (CardImage, Header…)
+│   │   ├── Home/           # HomeScreen + Components (CardImage, SearchBar, FilterChips, Header…)
 │   │   ├── MemeDetail/     # MemeDetailScreen (the meme editor)
-│   │   ├── Profile/        # ProfileScreen
 │   │   └── SplashScreen.tsx
+│   ├── Context/            # FavoritesContext (persisted favorites store)
 │   ├── Helpers/            # Pure utilities (e.g. handleError)
 │   ├── Hooks/              # React Query hooks: useListMeme, useCreateImage, useListFonts
-│   ├── Navigators/         # Navigation config: Application, MainBottomTab, Stack, utils
+│   ├── Navigators/         # Navigation config: Application, Stack, utils
 │   ├── Service/            # Axios instance (api.ts) + endpoint constants (constant.ts)
 │   ├── Type/               # Shared TypeScript types
 │   └── Utils/              # Common helpers
@@ -85,23 +85,23 @@ MemeGenerator/
 ### Navigation
 
 A native stack navigator (`src/Navigators/Application.tsx`) drives the top-level
-flow, with a bottom tab navigator (`MainBottomTab.tsx`) for the main tabs. Imperative
-navigation helpers live in `src/Navigators/utils.ts` (`navigate`, `navigateAndReset`,
-`goBack`).
+flow. Routes are typed via `RootStackParamList` (`src/Type/navigation.ts`), and
+imperative navigation helpers live in `src/Navigators/utils.ts` (`navigate`,
+`navigateAndReset`, `goBack`).
 
 ```text
-SplashScreen ──▶ HomeScreen (meme list) ──▶ MemeDetailScreen (editor)
-                      │
-                      └─▶ ProfileScreen
+SplashScreen ──▶ HomeScreen (search · filters · favorites) ──▶ MemeDetailScreen (editor)
 ```
 
 ### State management
 
 The app has no global client-state store and no authentication — the Memegen API
-is public, so there's no login, token, or persisted user state.
+is public, so there's no login or token.
 
 - **Server state** — React Query handles fetching, caching, and loading/error states.
 - **Local state** — React component hooks (`useState`, `useReducer`).
+- **Favorites** — a single-purpose React Context (`src/Context/FavoritesContext.tsx`)
+  persisted with AsyncStorage; the one piece of shared, durable client state.
 
 ### API layer
 

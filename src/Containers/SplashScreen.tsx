@@ -12,7 +12,7 @@ const SplashScreen = () => {
         resolve(true)
       }, 1000)
     )
-    navigateAndSimpleReset(Texts.MainBottomTab)
+    navigateAndSimpleReset(Texts.HomeScreen)
   }
 
   useEffect(() => {

@@ -1,10 +1,11 @@
 import handleError from '@/Helpers/handleError'
 import { axiosInstance } from '@/Service/api'
 import { END_POINT } from '@/Service/constant'
+import { MemeTemplate } from '@/Type'
 import { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 
-const request = async () => {
+const request = async (): Promise<MemeTemplate[]> => {
   const { data } = await axiosInstance.request({
     method: 'GET',
     url: END_POINT.templates,
