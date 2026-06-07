@@ -1,5 +1,4 @@
 export default {
-  Login: 'Login',
   Splash: 'Splash',
   DetailScreen: 'DetailScreen',
   HomeScreen: 'HomeScreen',

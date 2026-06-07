@@ -10,21 +10,18 @@
     "test": "jest"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^3.1.1",
     "@react-navigation/bottom-tabs": "^7.8.5",
     "@react-navigation/native": "^7.1.20",
     "@react-navigation/native-stack": "^7.6.3",
     "@react-navigation/stack": "^7.6.4",
-    "@reduxjs/toolkit": "^2.10.1",
+    "@d11/react-native-fast-image": "^8.13.0",
     "@tanstack/react-query": "^5.62.13",
     "axios": "^1.13.2",
     "lodash": "^4.17.21",
     "react": "19.2.7",
     "react-native": "0.85.3",
     "react-native-animatable": "^1.4.0",
-    "react-native-auto-height-image": "^3.2.4",
     "react-native-elements": "^3.4.3",
-    "react-native-fast-image": "^8.6.3",
     "react-native-gesture-handler": "^3.0.0",
     "react-native-image-progress": "^1.2.0",
     "react-native-loading-spinner-overlay": "^3.0.1",
@@ -36,11 +33,6 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-vector-icons": "^10.3.0",
     "react-native-worklets": "^0.9.1",
-    "react-redux": "^9.2.0",
-    "redux": "^5.0.1",
-    "redux-axios-middleware": "^4.0.1",
-    "redux-persist": "^6.0.0",
-    "redux-thunk": "^3.1.0",
     "rn-fetch-blob": "^0.12.0"
   },
   "devDependencies": {
@@ -74,7 +66,7 @@
       "./jest.setup.js"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|@react-navigation|react-native-.*|rn-fetch-blob|axios|@reduxjs/toolkit|redux|redux-persist|redux-thunk|redux-axios-middleware|reselect|immer|react-redux))"
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?|@react-navigation|react-native-.*|rn-fetch-blob|axios))"
     ]
   }
 }

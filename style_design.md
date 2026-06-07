@@ -794,7 +794,7 @@ iconSizeXl: 48,   // Extra large (featured icons)
 
 **Use FastImage** for optimized image loading:
 ```typescript
-import FastImage from 'react-native-fast-image';
+import FastImage from '@d11/react-native-fast-image';
 
 <FastImage
   source={{ uri: imageUrl }}

@@ -18,3 +18,6 @@ export { default as Skeleton } from './Skeleton/Skeleton'
 export type { SkeletonProps } from './Skeleton/Skeleton'
 
 export { default as SkeletonMemeCard } from './Skeleton/SkeletonMemeCard'
+
+export { default as AutoHeightImage } from './AutoHeightImage/AutoHeightImage'
+export type { AutoHeightImageProps } from './AutoHeightImage/AutoHeightImage'

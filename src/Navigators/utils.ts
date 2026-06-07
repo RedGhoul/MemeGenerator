@@ -8,7 +8,6 @@ import { CommonActions, createNavigationContainerRef } from '@react-navigation/n
 
 type RootStackParamList = {
   Splash: undefined
-  Login: undefined
   DetailScreen: any
 }
 
